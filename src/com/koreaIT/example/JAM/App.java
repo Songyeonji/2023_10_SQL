@@ -26,7 +26,7 @@ public class App {
 			Connection conn = null;
 
 			try {
-				Class.forName("com.mysql.jdbc.Driver");
+				Class.forName("com.mysql.cj.jdbc.Driver");
 
 			} catch (ClassNotFoundException e) {
 				System.out.println("드라이버 로딩 실패");
@@ -148,9 +148,20 @@ public class App {
 				System.out.printf("%d	/	%s\n", article.id, article.title);
 			}
 		} else if (cmd.startsWith("article modify")) {
-			System.out.println("==게시물 수정==");
 			int id = Integer.parseInt(cmd.split(" ")[2]);
 
+			SecSql sql = SecSql.from("SELECT COUNT(*) > 0");
+			sql.append("FROM article");
+			sql.append("WHERE id = ?", id);
+
+			int articleCount = DBUtil.selectRowIntValue(conn, sql);
+
+			if(articleCount == 0) {
+				System.out.printf("%d번 게시물은 존재하지 않습니다\n", id);
+				return 0;
+			}
+
+			System.out.println("==게시물 수정==");
 			System.out.printf("새 제목 : ");
 			String newTitle = sc.nextLine();
 			System.out.printf("새 내용 : ");
@@ -183,6 +194,16 @@ public class App {
 					e.printStackTrace();
 				}
 			}
+			
+			sql = new SecSql();
+			sql.append("UPDATE article");
+			sql.append("SET updateDate = NOW(),");
+			sql.append("title = ?,", newTitle);
+			sql.append("`body` = ?", newBody);
+			sql.append("WHERE id = ?", id);
+
+			DBUtil.update(conn, sql);
+			
 			System.out.println(id + "번 글이 수정되었습니다");
 		}
 
