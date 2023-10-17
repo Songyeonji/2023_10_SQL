@@ -67,8 +67,32 @@ public class App {
 			return -1;
 		}
 
-		if (cmd.equals("article write")) {
-			System.out.println("==게시물 작성==");
+		if (cmd.equals("member join")) {
+			System.out.println("== 회원가입 ==");
+			System.out.printf("아이디 : ");
+			String loginId = sc.nextLine();
+			System.out.printf("비밀번호 : ");
+			String loginPw = sc.nextLine();
+			System.out.printf("비밀번호 확인 : ");
+			String loginPwChk = sc.nextLine();
+			System.out.printf("이름 : ");
+			String name = sc.nextLine();
+
+			SecSql sql = new SecSql();
+			sql.append("INSERT INTO `member`");
+			sql.append("SET regDate = NOW(),");
+			sql.append("updateDate = NOW(),");
+			sql.append("loginId = ?,", loginId);
+			sql.append("loginPw = ?,", loginPw);
+			sql.append("name = ?", name);
+
+			DBUtil.insert(conn, sql);
+
+			System.out.println("회원가입이 완료되었습니다");
+			System.out.printf("[%s] 회원님 환영합니다\n", name);
+
+		} else if (cmd.equals("article write")) {
+			System.out.println("== 게시물 작성 ==");
 			System.out.printf("제목 : ");
 			String title = sc.nextLine();
 			System.out.printf("내용 : ");
@@ -99,7 +123,7 @@ public class App {
 			
 			List<Map<String, Object>> articleListMap = DBUtil.selectRows(conn, sql);
 			
-			for(Map<String, Object> articleMap : articleListMap) {
+			for (Map<String, Object> articleMap : articleListMap) {
 				articles.add(new Article(articleMap));
 			}
 			if (articles.size() == 0) {
