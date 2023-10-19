@@ -9,6 +9,8 @@ CREATE TABLE article(
     `body` TEXT NOT NULL
 );
 
+ALTER TABLE article ADD COLUMN memberId INT UNSIGNED NOT NULL AFTER updateDate;
+
 CREATE TABLE `member`(
     id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
     regDate DATETIME NOT NULL,
@@ -28,6 +30,7 @@ title = CONCAT('제목', RAND()),
 INSERT INTO `member`
 SET regDate = NOW(),
 updateDate = NOW(),
+memberId = 1,
 loginId = 'test',
 loginPw = 'test',
 `name` = '유저1';
