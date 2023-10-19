@@ -70,13 +70,23 @@ public class ArticleController {
 	}
 
 	public void doModify(String cmd) {
+		
+		if(Session.isLogined() == false) {
+			System.out.println("로그인 후 이용해주세요");
+			return;
+		}
 
 		int id = Integer.parseInt(cmd.split(" ")[2]);
 
-		int articleCount = articleService.articleCount(id);
-
-		if (articleCount == 0) {
+		Article article = articleService.getArticle(id);
+		
+		if (article == null) {
 			System.out.printf("%d번 게시물은 존재하지 않습니다\n", id);
+			return;
+		}
+		
+		if(article.memberId != Session.loginedMemberId) {
+			System.out.println("해당 게시글에 대한 권한이 없습니다");
 			return;
 		}
 
@@ -92,15 +102,27 @@ public class ArticleController {
 	}
 
 	public void doDelete(String cmd) {
-		int id = Integer.parseInt(cmd.split(" ")[2]);
-
-		int affectedRow = articleService.doDelete(id);
-
-		if (affectedRow == 0) {
-			System.out.printf("%d번 게시물은 존재하지 않습니다\n", id);
+		
+		if(Session.isLogined() == false) {
+			System.out.println("로그인 후 이용해주세요");
 			return;
 		}
 
+		int id = Integer.parseInt(cmd.split(" ")[2]);
+
+		Article article = articleService.getArticle(id);
+		
+		if (article == null) {
+			System.out.printf("%d번 게시물은 존재하지 않습니다\n", id);
+			return;
+		}
+		
+		if(article.memberId != Session.loginedMemberId) {
+			System.out.println("해당 게시글에 대한 권한이 없습니다");
+			return;
+		}
+
+		articleService.doDelete(id);
 		System.out.printf("== %d번 게시물 삭제==\n", id);
 		System.out.println(id + "번 글이 삭제되었습니다");
 	}
